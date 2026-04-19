@@ -15,6 +15,7 @@ int num_lines = 0;
 int cursor_row = 0;
 int cursor_col = 0;
 char filename[256];
+int command_mode = 0;
 
 void clear_screen() {
     printf("\033[2J\033[H");
@@ -22,13 +23,20 @@ void clear_screen() {
 
 void draw_editor() {
     clear_screen();
-    printf("Puff - %s | ESC then s: Save | ESC then q: Quit\n", filename);
+    if (command_mode)
+        printf("Puff - %s | [COMMAND] s: Save | q: Quit\n", filename);
+    else
+        printf("Puff - %s | ESC: Command mode\n", filename);
     printf("----------------------------------------\n");
     for (int i = 0; i < num_lines; i++) {
-        if (i == cursor_row)
-            printf("\033[7m%s\033[0m\n", lines[i]);
-        else
-            printf("%s\n", lines[i]);
+        int len = strlen(lines[i]);
+        for (int j = 0; j <= len; j++) {
+            if (i == cursor_row && j == cursor_col)
+                printf("\033[7m%c\033[0m", j < len ? lines[i][j] : ' ');
+            else if (j < len)
+                printf("%c", lines[i][j]);
+        }
+        printf("\n");
     }
 }
 
@@ -59,6 +67,22 @@ void save_file() {
     fclose(f);
 }
 
+int read_key() {
+    int c = getchar();
+    if (c == 27) {
+        int c2 = getchar();
+        if (c2 == '[') {
+            int c3 = getchar();
+            if (c3 == 'A') return 1000; /* up */
+                if (c3 == 'B') return 1001; /* down */
+                    if (c3 == 'C') return 1002; /* right */
+                        if (c3 == 'D') return 1003; /* left */
+        }
+        return 27; /* plain ESC */
+    }
+    return c;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("Usage: puff <filename>\n");
@@ -76,20 +100,28 @@ int main(int argc, char *argv[]) {
     while (1) {
         draw_editor();
 
-        int c = getchar();
+        int c = read_key();
 
-        static int command_mode = 0;
-
-	if (c == 27) { /* Escape */
-    		command_mode = 1;
-	} else if (command_mode) {
-    	if (c == 'q') {
-        	break;
-    	} else if (c == 's') {
-        	save_file();
-    	}
-    command_mode = 0;
-} else if (c == '\n') {
+        if (c == 27) {
+            command_mode = !command_mode;
+        } else if (command_mode) {
+            if (c == 'q') break;
+            if (c == 's') save_file();
+        } else if (c == 1000 && cursor_row > 0) {
+            cursor_row--;
+            if (cursor_col > (int)strlen(lines[cursor_row]))
+                cursor_col = strlen(lines[cursor_row]);
+        } else if (c == 1001 && cursor_row < num_lines - 1) {
+            cursor_row++;
+            if (cursor_col > (int)strlen(lines[cursor_row]))
+                cursor_col = strlen(lines[cursor_row]);
+        } else if (c == 1002) {
+            if (cursor_col < (int)strlen(lines[cursor_row]))
+                cursor_col++;
+        } else if (c == 1003) {
+            if (cursor_col > 0)
+                cursor_col--;
+        } else if (c == '\n') {
             num_lines++;
             for (int i = num_lines - 1; i > cursor_row + 1; i--)
                 strcpy(lines[i], lines[i-1]);
