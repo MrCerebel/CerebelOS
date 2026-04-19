@@ -1,0 +1,32 @@
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs none /dev
+
+echo "Welcome to CerebelOS"
+
+exec /bin/busybox shWelcome to CerebelOS
+cttyhack: applet not found
+[    0.890048] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00
+[    0.890597] CPU: 0 UID: 0 PID: 1 Comm: cttyhack Not tainted 6.12.13-0-virt #1-Alpine
+[    0.890891] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown 02/02/2022
+[    0.891191] Call trace:
+[    0.891272]  dump_backtrace+0xf0/0x140
+[    0.891713]  show_stack+0x28/0x4c
+[    0.891817]  dump_stack_lvl+0x60/0x94
+[    0.891926]  dump_stack+0x18/0x30
+[    0.892014]  panic+0x168/0x378
+[    0.892098]  do_exit+0x9cc/0x9d0
+[    0.892186]  do_group_exit+0x34/0x90
+[    0.892281]  pid_child_should_wake+0x0/0xb0
+[    0.892398]  invoke_syscall+0x78/0x120
+[    0.892502]  el0_svc_common.constprop.0+0x54/0x128
+[    0.892631]  do_el0_svc+0x28/0x58
+[    0.892720]  el0_svc+0x38/0x180
+[    0.892804]  el0t_64_sync_handler+0x140/0x14c
+[    0.892913]  el0t_64_sync+0x190/0x194
+[    0.893245] Kernel Offset: disabled
+[    0.893349] CPU features: 0x00,00000080,00200000,0200421b
+[    0.893644] Memory Limit: none
+[    0.893938] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00007f00 ]---

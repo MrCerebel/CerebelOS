@@ -1,0 +1,27 @@
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs none /dev
+
+echo 3 > /proc/sys/kernel/printk
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+hostname cerebelOS
+
+# Load disk modules
+/bin/busybox modprobe virtio_pci
+/bin/busybox modprobe virtio_blk
+/bin/busybox modprobe crc32c
+/bin/busybox modprobe crc32c_generic
+/bin/busybox modprobe ext4
+
+# Mount real disk
+/bin/busybox mount -t ext4 /dev/vda /mnt
+
+# Bind mounts
+mount --bind /dev /mnt/dev
+mount --bind /proc /mnt/proc
+mount --bind /sys /mnt/sys
+
+# Switch to real root and start Spark
+exec /bin/busybox switch_root /mnt /sbin/spark

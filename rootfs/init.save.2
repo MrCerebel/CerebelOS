@@ -1,0 +1,52 @@
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs none /dev
+
+echo 3 > /proc/sys/kernel/printk
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+hostname cerebelOS
+
+# Load disk modules
+/bin/busybox modprobe virtio_pci
+/bin/busybox modprobe virtio_blk
+/bin/busybox modprobe crc32c
+/bin/busybox modprobe crc32c_generic
+/bin/busybox modprobe ext4
+
+# Mount real disk and switch root
+/bin/busybox mount -t ext4 /dev/vda /mnt
+
+# Networking
+/bin/busybox modprobe e1000
+/bin/busybox modprobe af_packet
+/bin/busybox ifconfig eth0 up
+/bin/busybox ip addr add 10.0.2.15/24 dev eth0
+/bin/busybox ip route add default via 10.0.2.2 dev eth0
+echo "nameserver 10.0.2.3" > /mnt/etc/resolv.conf
+
+echo "If it works,don't touch it!"
+
+    2.848007] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000100
+[    2.848505] CPU: 0 UID: 0 PID: 1 Comm: busybox Not tainted 6.12.13-0-virt #1-Alpine
+[    2.848802] Hardware name: QEMU QEMU Virtual Machine, BIOS unknown 02/02/2022
+[    2.849098] Call trace:
+[    2.849183]  dump_backtrace+0xf0/0x140
+[    2.849636]  show_stack+0x28/0x4c
+[    2.849757]  dump_stack_lvl+0x60/0x94
+[    2.849878]  dump_stack+0x18/0x30
+[    2.849972]  panic+0x168/0x378
+[    2.850056]  do_exit+0x9cc/0x9d0
+[    2.850145]  do_group_exit+0x34/0x90
+[    2.850242]  pid_child_should_wake+0x0/0xb0
+[    2.850352]  invoke_syscall+0x78/0x120
+[    2.850453]  el0_svc_common.constprop.0+0x54/0x128
+[    2.850599]  do_el0_svc+0x28/0x58
+[    2.850695]  el0_svc+0x38/0x180
+[    2.850782]  el0t_64_sync_handler+0x140/0x14c
+[    2.850896]  el0t_64_sync+0x190/0x194
+[    2.851235] Kernel Offset: disabled
+[    2.851339] CPU features: 0x00,00000080,00200000,0200421b
+[    2.851678] Memory Limit: none
+[    2.852012] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000100 ]---

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs none /dev
+
+hostname cerebelOS
+
+# Networking
+/bin/busybox modprobe e1000
+/bin/busybox modprobe af_packet
+/bin/busybox ifconfig eth0 up
+/bin/busybox ip addr add 10.0.2.15/24 dev eth0
+/bin/busybox ip route add default via 10.0.2.2 dev eth0
+echo "nameserver 10.0.2.3" > /etc/resolv.conf
+
+echo "If it works,don't touch it!"
+
+exec /bin/busybox sh
