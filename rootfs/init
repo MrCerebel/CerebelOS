@@ -9,11 +9,6 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin
 hostname cerebelOS
 
 # Load disk modules
-/bin/busybox modprobe virtio_pci
-/bin/busybox modprobe virtio_blk
-/bin/busybox modprobe crc32c
-/bin/busybox modprobe crc32c_generic
-/bin/busybox modprobe ext4
 
 # Mount real disk
 /bin/busybox mount -t ext4 /dev/vda /mnt

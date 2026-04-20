@@ -7,7 +7,7 @@ DASH=$(printf '%*s' "$COLS" | tr ' ' '-')
 
 # System info
 OS="CerebelOS"
-VERSION="0.0.1a"
+VERSION="0.0.3a"
 KERNEL=$(uname -r)
 UPTIME=$(uptime | sed 's/.*up //' | sed 's/,.*//')
 SHELL="/bin/sh"
